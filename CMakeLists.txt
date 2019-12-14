@@ -1,6 +1,35 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(turtle_go_to_goal)
 
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg message_generation  message_runtime)
+
+
+catkin_package(
+
+	CATKIN_DEPENDS roscpp rospy std_msgs message_runtime message_generation
+
+)
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+
+add_executable(turtlego src/turtle_go_to_goal.cpp)
+
+target_link_libraries(turtlego ${catkin_LIBRARIES})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
