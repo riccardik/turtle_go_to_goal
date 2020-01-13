@@ -54,6 +54,8 @@ float checkTheta2()
 }
 
 
+
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "turtle_go_to_goal");
@@ -70,27 +72,29 @@ int main(int argc, char **argv)
   //Manage here the publisher and the subscriber
   ros::Subscriber sub = n.subscribe("/turtle1/pose", 1000, getPositionCallback);
   ros::Publisher pub = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 1000);
-
+  ros::spinOnce();
   //subscribe to the topic pose
   //rostopic liste
   // rostopic info /turtle1/cmd_vel
   //rosmsg show to get how a message works
-
+  y_real=x_real=5.54444;
 
   //calculate tetatarget
   float tetatarget=0;
 
-  tetatarget=acos((x_goal*x_real+y_real*y_goal)/ecd(x_goal,y_goal,x_real,y_real));
+  //tetatarget=acos((x_goal*x_real+y_real*y_goal)/EuclidianDistance(x_goal,y_goal,x_real,y_real));
 
   //tetatarget=atan2(y_goal,x_goal) - atan2(y_real,x_real);
 
   cout<<tetatarget<<"\t"<<theta_real<<endl;
-  if ((x_goal*y_real-x_real*y_goal)<0)
-    tetatarget=-tetatarget;
+  cout<<x_goal/sqrt(x_goal*x_goal+y_goal*y_goal)<<"\t"<<(5.54444*5.54444+5.54444*5.54444)<<endl;
+ if ((x_goal*y_real-x_real*y_goal)>0)
+  {
 
-tetatarget=3.14/4;
-
-
+      tetatarget=tetatarget;
+    }
+    else
+      tetatarget=-tetatarget;
 
   while (ros::ok())
   //rostopic echo  /turtle1/pose
@@ -114,20 +118,26 @@ tetatarget=3.14/4;
       }*/
 
 
+//tetatarget=acos(x_goal/sqrt(x_goal*x_goal+y_goal*y_goal))- acos(x_real/sqrt(x_real*x_real+y_real*y_real));
+
+tetatarget=acos((sin(theta_real)*(y_goal-y_real)+cos(theta_real)*(x_goal-x_real))/EuclidianDistance(x_goal,y_goal,x_real,y_real));
+
 
 
     if (aligned!=1)
     {
       //if (-checkTheta1()>theta_real+0.1 || -checkTheta1()<theta_real-0.1)
       //if (!((checkTheta2()<theta_real+0.1 && checkTheta2()>theta_real-0.1) && (checkTheta1()<theta_real+0.1 && checkTheta1()>theta_real-0.1)))
-      if (!(tetatarget-0.05<theta_real && tetatarget+0.05>theta_real))
+      //if (!(tetatarget-0.05<theta_real && tetatarget+0.05>theta_real))
+      if (!(tetatarget<0.01 && tetatarget>-0.01))
+      //if (tetatarget>0.05)
       //if (!(tetatarget-0.05<theta_real && tetatarget+0.05>theta_real) && !((EuclidianDistance(x_goal,y_goal,x_real,y_real)*cos(theta_real)<0 && EuclidianDistance(x_goal,y_goal,x_real,y_real)*sin(theta_real)>0)||(EuclidianDistance(x_goal,y_goal,x_real,y_real)*cos(theta_real)>0 && EuclidianDistance(x_goal,y_goal,x_real,y_real)*sin(theta_real)<0)) )
       //if (atan2(y_goal-y_real,x_goal-x_real)!=theta_real)
       //if (sqrt(pow(x_goal-x_real, 2))!=sqrt(pow(y_goal-y_real, 2)))
       {
 
         msg.angular.z = 1;
-        if (x_real<x_goal)
+        /*if (x_real<x_goal)
           velx=cos(tetatarget);
 
         else
@@ -135,37 +145,35 @@ tetatarget=3.14/4;
         if (y_real<y_goal)
           vely=sin(tetatarget);
         else
-          vely=-sin(tetatarget);
+          vely=-sin(tetatarget);*/
       }
 
       else
         aligned=1;
 
-
     }
     else
       {
         msg.linear.x=1;
-        msg.linear.y=1;
+        //msg.linear.y=vely;
         msg.angular.z = 0;
-        aligned=1;
       }
 
 
 
+/*
+      if(EuclidianDistance(x_goal,y_goal,x_real,y_real)<0.5)
+      {  msg.linear.x=-5;
 
-      /*if(EuclidianDistance(x_goal,y_goal,x_real,y_real)<0.5)
-      {  msg.linear.x=0;
-        msg.linear.y=0;
-      }*/
-
+      }
+*/
 
 
     //  cout<<checkTheta1()<<"\t"<<theta_real<<"\t"<<checkTheta2()<<"\t"<<aligned<<endl;
-    cout<<tetatarget<<"\t"<<theta_real<<"\t"<<aligned<<endl;
+    //cout<<tetatarget<<"\t"<<theta_real<<"\t"<<aligned<<endl;
 
     //cout<<x_real<<"\t"<<y_real<<"\t"<<theta_real<<endl;
-      //cout<<x_real<<"\t"<<y_real<<"\t"<<x_goal<<"\t"<<y_goal<<endl;
+      cout<<x_real<<"\t"<<y_real<<"\t"<<x_goal<<"\t"<<y_goal<<endl;
 
   //  cout<<atan2(y_real-y_goal, x_real-x_goal)<<"\t"<<atan2(y_goal,x_goal)<<theta_real<<endl;
 
@@ -174,6 +182,12 @@ tetatarget=3.14/4;
     loop_rate.sleep();
     ros::spinOnce();
 
+
+          if(EuclidianDistance(x_goal,y_goal,x_real,y_real)<0.5)
+          {  msg.linear.x=0;
+
+          }
+          pub.publish(msg);
     // Exit conditions
     counter++;
     if(counter>=900)
