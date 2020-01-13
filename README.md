@@ -25,7 +25,7 @@
 
 ## Results
 
-| Goal positions| Error in reaching the goal| Number of iterations to reaching the goal  |
+| Goal positions| Error in reaching the goal| Number of iterations to reach the goal  |
 | ------------- |:-------------------------:| ------------------------------------------:|
 | (7, 4)        |          0.490303                 |   221                                         |
 | (2, 9)        |          0.486165                 |            215                                 |
